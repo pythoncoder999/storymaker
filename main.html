@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rockefeller Life Story Generator</title>
+    <title>Life Story Generator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
@@ -13,195 +13,153 @@
         }
 
         body {
-            font-family: 'Georgia', serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: #333;
-            line-height: 1.6;
+            padding: 20px;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
 
         .header {
-            text-align: center;
-            margin-bottom: 40px;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            padding: 30px;
+            text-align: center;
         }
 
         .header h1 {
-            font-size: 2.5em;
+            font-size: 2.5rem;
             margin-bottom: 10px;
-            font-weight: bold;
         }
 
         .header p {
-            font-size: 1.2em;
+            font-size: 1.1rem;
             opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
         }
 
-        .form-container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
-            transform: translateY(0);
-            transition: transform 0.3s ease;
-        }
-
-        .form-container:hover {
-            transform: translateY(-5px);
+        .form-section {
+            padding: 30px;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
-            color: #2a5298;
-            font-size: 1.1em;
+            color: #2c3e50;
         }
 
-        input[type="text"] {
+        input, select, textarea {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 1.1em;
+            font-size: 16px;
             transition: border-color 0.3s ease;
-            background: #f9f9f9;
         }
 
-        input[type="text"]:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #2a5298;
-            background: white;
+            border-color: #3498db;
         }
 
-        .generate-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, #2a5298, #1e3c72);
+        .optional {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             color: white;
+            padding: 15px 30px;
             border: none;
             border-radius: 8px;
-            font-size: 1.2em;
-            font-weight: bold;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-right: 10px;
         }
 
-        .generate-btn:hover {
-            background: linear-gradient(45deg, #1e3c72, #2a5298);
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
         }
 
-        .story-container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        .story-preview {
             margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
             display: none;
         }
 
-        .story-title {
-            text-align: center;
-            color: #2a5298;
-            font-size: 2.2em;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #2a5298;
-            padding-bottom: 15px;
+        .story-preview h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
         }
 
         .story-content {
-            font-size: 1.1em;
-            line-height: 1.8;
-            color: #444;
-            text-align: justify;
+            line-height: 1.6;
+            color: #34495e;
         }
 
-        .story-section {
-            margin-bottom: 25px;
-            padding: 20px;
-            border-left: 4px solid #2a5298;
-            background: #f8f9fa;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .story-section h3 {
-            color: #2a5298;
+        .story-content p {
             margin-bottom: 15px;
-            font-size: 1.3em;
         }
 
-        .actions {
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .action-btn {
-            margin: 0 10px;
-            padding: 12px 25px;
-            background: #2a5298;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn:hover {
-            background: #1e3c72;
-            transform: translateY(-2px);
-        }
-
-        .share-section {
-            margin-top: 20px;
-            padding: 20px;
-            background: #f0f8ff;
+        .rockefeller-quote {
+            background: #ecf0f1;
+            padding: 15px;
             border-radius: 8px;
-            border: 1px solid #2a5298;
-        }
-
-        .share-link {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.9em;
+            font-style: italic;
+            margin: 20px 0;
+            border-left: 4px solid #e74c3c;
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #2a5298;
-            font-size: 1.2em;
+            padding: 20px;
+            display: none;
         }
 
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #2a5298;
+            border-top: 4px solid #3498db;
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 0 auto 10px;
         }
 
         @keyframes spin {
@@ -209,34 +167,14 @@
             100% { transform: rotate(360deg); }
         }
 
-        .inspiration-quote {
-            text-align: center;
-            font-style: italic;
-            color: white;
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .form-container, .story-container {
-                padding: 20px;
+            .row {
+                flex-direction: column;
+                gap: 0;
             }
             
             .header h1 {
-                font-size: 2em;
-            }
-            
-            .action-btn {
-                display: block;
-                width: 100%;
-                margin: 10px 0;
+                font-size: 2rem;
             }
         }
     </style>
@@ -244,245 +182,244 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>✨ Rockefeller Life Story Generator ✨</h1>
-            <p>Create an inspiring life story based on the timeless wisdom of J.D. Rockefeller's principles for success and prosperity</p>
+            <h1>Life Story Generator</h1>
+            <p>Create your inspiring life story based on Rockefeller's principles</p>
         </div>
-
-        <div class="form-container">
-            <div class="form-group">
-                <label for="name">Your Name:</label>
-                <input type="text" id="name" placeholder="Enter your name to begin your journey..." required>
-            </div>
+        
+        <div class="form-section">
+            <form id="lifeStoryForm">
+                <div class="form-group">
+                    <label for="name">Your Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="dreamCareer">Dream Career:</label>
+                            <select id="dreamCareer" name="dreamCareer" required>
+                                <option value="">Select your dream career</option>
+                                <option value="Entrepreneur">Entrepreneur</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Lawyer">Lawyer</option>
+                                <option value="Engineer">Engineer</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Artist">Artist</option>
+                                <option value="Scientist">Scientist</option>
+                                <option value="Business Executive">Business Executive</option>
+                                <option value="Architect">Architect</option>
+                                <option value="Writer">Writer</option>
+                                <option value="Technology Leader">Technology Leader</option>
+                                <option value="Environmental Activist">Environmental Activist</option>
+                                <option value="Social Worker">Social Worker</option>
+                                <option value="Athlete">Professional Athlete</option>
+                                <option value="Musician">Musician</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="university">Top University:</label>
+                            <select id="university" name="university" required>
+                                <option value="">Select your dream university</option>
+                                <option value="Harvard University">Harvard University</option>
+                                <option value="Stanford University">Stanford University</option>
+                                <option value="MIT">MIT</option>
+                                <option value="Yale University">Yale University</option>
+                                <option value="Princeton University">Princeton University</option>
+                                <option value="Columbia University">Columbia University</option>
+                                <option value="University of Chicago">University of Chicago</option>
+                                <option value="University of Pennsylvania">University of Pennsylvania</option>
+                                <option value="California Institute of Technology">California Institute of Technology</option>
+                                <option value="Northwestern University">Northwestern University</option>
+                                <option value="Duke University">Duke University</option>
+                                <option value="Johns Hopkins University">Johns Hopkins University</option>
+                                <option value="Cornell University">Cornell University</option>
+                                <option value="University of California, Berkeley">UC Berkeley</option>
+                                <option value="University of California, Los Angeles">UCLA</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="partner">Partner's Name: <span class="optional">(Optional)</span></label>
+                            <input type="text" id="partner" name="partner">
+                        </div>
+                    </div>
+                    
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="children">Children's Names: <span class="optional">(Optional - separate with commas)</span></label>
+                            <input type="text" id="children" name="children" placeholder="e.g., Emma, Michael, Sarah">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="additionalInfo">Additional Information: <span class="optional">(Optional)</span></label>
+                    <textarea id="additionalInfo" name="additionalInfo" rows="3" placeholder="Any specific details you'd like to include in your story..."></textarea>
+                </div>
+                
+                <div>
+                    <button type="submit" class="btn">Generate My Life Story</button>
+                    <button type="button" class="btn btn-secondary" onclick="showPreview()">Preview Story</button>
+                    <button type="button" class="btn btn-success" onclick="generatePDF()" id="pdfBtn" style="display: none;">Download PDF</button>
+                </div>
+            </form>
             
-            <button class="generate-btn" onclick="generateStory()">
-                🚀 Generate My Life Story
-            </button>
-        </div>
-
-        <div class="story-container" id="storyContainer">
-            <div class="loading" id="loading" style="display: none;">
+            <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>Crafting your inspiring life story...</p>
+                <p>Generating your inspiring life story...</p>
             </div>
             
-            <div id="storyContent" style="display: none;">
-                <h2 class="story-title" id="storyTitle"></h2>
-                <div class="story-content" id="storyText"></div>
-                
-                <div class="actions">
-                    <button class="action-btn" onclick="generatePDF()">📄 Download PDF</button>
-                    <button class="action-btn" onclick="shareStory()">🔗 Share Story</button>
-                    <button class="action-btn" onclick="generateNewStory()">✨ New Story</button>
-                </div>
-                
-                <div class="share-section" id="shareSection" style="display: none;">
-                    <h4>Share Your Story:</h4>
-                    <input type="text" class="share-link" id="shareLink" readonly>
-                    <button class="action-btn" onclick="copyLink()">📋 Copy Link</button>
+            <div class="story-preview" id="storyPreview">
+                <h3>Your Life Story Preview</h3>
+                <div class="story-content" id="storyContent">
+                    <!-- Story will be generated here -->
                 </div>
             </div>
-        </div>
-
-        <div class="inspiration-quote">
-            <p>"The ability to deal with people is as purchasable a commodity as sugar or coffee. And I will pay more for that ability than for any other under the sun." - J.D. Rockefeller</p>
         </div>
     </div>
 
     <script>
-        let currentStory = null;
-        let currentName = '';
+        let generatedStory = '';
+        
+        const rockefellerQuotes = [
+            "Your starting point doesn't define you. It's about the choices you make and the actions you take.",
+            "Success comes from consistent effort and not giving up, even when things get tough.",
+            "Confidence is key. Believing in your abilities drives success.",
+            "Don't wait for the perfect moment. Take action now.",
+            "Turn challenges into opportunities. Hardships build character and skills.",
+            "You create your own opportunities through planning and hard work.",
+            "Making excuses stops progress. Take responsibility for your actions.",
+            "Stay humble and learn from others. Value teamwork.",
+            "Give back with purpose. Help others in ways that make a real difference.",
+            "Your attitude shapes your life. View work as a joy, not a burden."
+        ];
+
+        document.getElementById('lifeStoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateStory();
+        });
 
         function generateStory() {
-            const name = document.getElementById('name').value.trim();
-            if (!name) {
-                alert('Please enter your name to generate your story!');
+            const formData = new FormData(document.getElementById('lifeStoryForm'));
+            const data = Object.fromEntries(formData);
+            
+            if (!data.name || !data.dreamCareer || !data.university) {
+                alert('Please fill in all required fields (Name, Dream Career, and University).');
                 return;
             }
-
-            currentName = name;
-            document.getElementById('storyContainer').style.display = 'block';
+            
+            // Show loading
             document.getElementById('loading').style.display = 'block';
-            document.getElementById('storyContent').style.display = 'none';
-            document.getElementById('shareSection').style.display = 'none';
-
-            // Simulate loading time for better UX
+            document.getElementById('storyPreview').style.display = 'none';
+            
+            // Simulate story generation (in real app, this would be an API call)
             setTimeout(() => {
-                createLifeStory(name);
+                generatedStory = createLifeStory(data);
+                document.getElementById('storyContent').innerHTML = generatedStory;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('storyPreview').style.display = 'block';
+                document.getElementById('pdfBtn').style.display = 'inline-block';
             }, 2000);
         }
 
-        function createLifeStory(name) {
-            const storyTemplate = {
-                title: `The Remarkable Journey of ${name}`,
-                sections: [
-                    {
-                        title: "Humble Beginnings",
-                        content: `${name} was born into modest circumstances, but even as a young person, there was something different about their approach to life. Unlike their peers who saw limitations, ${name} viewed every challenge as a stepping stone. They understood early that success isn't determined by where you start, but by the choices you make and the persistence you show. With unwavering determination, ${name} began their journey toward greatness.`
-                    },
-                    {
-                        title: "The Foundation Years",
-                        content: `During their formative years, ${name} embraced the principle of hard work above all else. While others sought shortcuts, ${name} knew that consistent effort was the true foundation of wealth and achievement. They dedicated themselves to learning, growing, and building the skills that would serve them throughout life. Every setback became a lesson, every challenge an opportunity to grow stronger and wiser.`
-                    },
-                    {
-                        title: "Building Confidence",
-                        content: `${name} discovered that believing in oneself was not just important—it was essential. They learned to trust their abilities and potential, never letting fear or self-doubt hold them back from pursuing their dreams. This confidence became their greatest asset, driving them to take calculated risks and seize opportunities that others might have missed. ${name} understood that confidence is the key that unlocks all other doors to success.`
-                    },
-                    {
-                        title: "Taking Action",
-                        content: `Rather than waiting for the perfect moment, ${name} embraced the power of taking action. They learned that perfection is the enemy of progress, and that initiative and decisive action create opportunities. Whether starting a new project, pursuing a goal, or facing a challenge, ${name} never hesitated to move forward. This bias toward action became their competitive advantage in a world full of hesitation.`
-                    },
-                    {
-                        title: "Turning Challenges into Triumphs",
-                        content: `Every obstacle that ${name} encountered became fuel for their growth. They understood that hardships build character and that difficulties are the training ground for future success. Instead of being discouraged by setbacks, ${name} used them as opportunities to develop resilience, creativity, and problem-solving skills. This ability to transform challenges into advantages set them apart from the crowd.`
-                    },
-                    {
-                        title: "Creating Their Own Luck",
-                        content: `${name} discovered that luck wasn't random—it was something you could create through preparation and hard work. They planned meticulously, worked diligently, and positioned themselves to take advantage of opportunities when they arose. Through strategic thinking and consistent effort, ${name} learned to manufacture their own success, making what others called 'luck' a predictable outcome of their efforts.`
-                    },
-                    {
-                        title: "The Power of Responsibility",
-                        content: `Taking full responsibility for their actions and outcomes became ${name}'s superpower. They refused to make excuses or blame circumstances for their situation. Instead, they focused on solutions and took ownership of both their successes and failures. This accountability mindset accelerated their growth and earned them the respect of everyone they encountered.`
-                    },
-                    {
-                        title: "Leadership Through Humility",
-                        content: `As ${name} achieved success, they never forgot the importance of humility and learning from others. They valued the strengths and contributions of those around them, creating strong teams and meaningful relationships. Their leadership style was built on appreciation, collaboration, and continuous learning—qualities that multiplied their impact and influence.`
-                    },
-                    {
-                        title: "The Joy of Giving Back",
-                        content: `With growing success came growing responsibility. ${name} understood that wealth and achievement should be used to lift others up. They gave back to their community not through handouts that created dependency, but through empowerment that helped others build their own success. This purposeful giving became a source of deep satisfaction and meaningful legacy.`
-                    },
-                    {
-                        title: "The Attitude That Changed Everything",
-                        content: `Throughout their journey, ${name} maintained a positive attitude that transformed work from a burden into a joy. They understood that mindset shapes reality, and by choosing to see opportunity in every situation, they created a life filled with purpose and satisfaction. This attitude became contagious, inspiring everyone around them to reach for their own greatness.`
-                    },
-                    {
-                        title: "The Legacy",
-                        content: `Today, ${name} stands as a testament to the power of applying timeless principles to modern life. Their journey from humble beginnings to remarkable success proves that with the right mindset, consistent effort, and unwavering determination, anyone can achieve greatness. ${name}'s story continues to inspire others to chase their dreams and handle life's challenges with wisdom and grace. The principles that guided ${name} continue to light the way for future generations of dreamers and achievers.`
-                    }
-                ]
-            };
+        function createLifeStory(data) {
+            const childrenText = data.children ? 
+                data.children.split(',').map(name => name.trim()).join(', ') : '';
+            
+            const partnerSection = data.partner ? 
+                `<p>During your time at ${data.university}, you met ${data.partner}, who would become your life partner and greatest supporter. Together, you built not just a career, but a life filled with love, understanding, and shared dreams.</p>` : '';
+            
+            const childrenSection = childrenText ? 
+                `<p>Your family grew to include ${childrenText}, and you taught them the same principles that guided your success. You showed them that their starting point doesn't define them, and that with hard work, persistence, and the right attitude, they too could achieve their dreams.</p>` : '';
+            
+            const additionalSection = data.additionalInfo ? 
+                `<p>Throughout your journey, ${data.additionalInfo.toLowerCase()}. This experience reinforced the Rockefeller principle that challenges become opportunities when faced with the right mindset.</p>` : '';
 
-            currentStory = storyTemplate;
-            displayStory(storyTemplate);
+            return `
+                <div class="rockefeller-quote">
+                    "${rockefellerQuotes[Math.floor(Math.random() * rockefellerQuotes.length)]}"
+                </div>
+                
+                <p><strong>The Early Years:</strong> ${data.name} was born into a world full of possibilities. Like John D. Rockefeller taught, your starting point doesn't define you—it's about the choices you make and the actions you take. From an early age, you demonstrated the persistence and work ethic that would become the foundation of your success.</p>
+                
+                <p><strong>Education and Growth:</strong> Your dedication to learning led you to ${data.university}, one of the world's most prestigious institutions. Here, you didn't just study—you absorbed the principle that confidence is key and that believing in your abilities drives success. You took action without waiting for perfection, seizing every opportunity to grow.</p>
+                
+                ${partnerSection}
+                
+                <p><strong>Career Beginnings:</strong> Armed with your education and unwavering determination, you embarked on your journey to become a ${data.dreamCareer}. You faced numerous challenges, but remembering Rockefeller's wisdom, you turned each obstacle into an opportunity. Your attitude shaped your life—you viewed work as a joy, not a burden.</p>
+                
+                <p><strong>Professional Success:</strong> Through consistent effort and refusing to give up, you built a remarkable career in ${data.dreamCareer.toLowerCase()}. You created your own luck through planning and hard work, never making excuses but always taking responsibility for your actions. Your success wasn't just personal—you stayed humble and learned from others, valuing teamwork and collaboration.</p>
+                
+                ${childrenSection}
+                
+                <p><strong>Legacy and Giving Back:</strong> As your success grew, you remembered Rockefeller's principle about giving back with purpose. You helped others in ways that made a real difference, not creating dependency but empowering people to achieve their own success. Your contributions to society became as meaningful as your professional achievements.</p>
+                
+                ${additionalSection}
+                
+                <p><strong>The Golden Years:</strong> Looking back on your life, you realized that every principle from Rockefeller's letters had guided your journey. You had proven that with hard work, persistence, self-belief, and the right attitude, anyone can create an extraordinary life. Your story became an inspiration to others, showing that dreams can indeed become reality.</p>
+                
+                <div class="rockefeller-quote">
+                    "Your life story, ${data.name}, is a testament to the timeless wisdom that success comes not from where you start, but from the choices you make and the actions you take along the way."
+                </div>
+            `;
         }
 
-        function displayStory(story) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('storyContent').style.display = 'block';
-            document.getElementById('storyTitle').textContent = story.title;
+        function showPreview() {
+            const name = document.getElementById('name').value;
+            const dreamCareer = document.getElementById('dreamCareer').value;
+            const university = document.getElementById('university').value;
             
-            const storyText = document.getElementById('storyText');
-            storyText.innerHTML = '';
+            if (!name || !dreamCareer || !university) {
+                alert('Please fill in all required fields (Name, Dream Career, and University) to preview your story.');
+                return;
+            }
             
-            story.sections.forEach(section => {
-                const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'story-section';
-                sectionDiv.innerHTML = `
-                    <h3>${section.title}</h3>
-                    <p>${section.content}</p>
-                `;
-                storyText.appendChild(sectionDiv);
-            });
+            generateStory();
         }
 
         function generatePDF() {
-            if (!currentStory) return;
-
+            if (!generatedStory) {
+                alert('Please generate your story first!');
+                return;
+            }
+            
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
+            const name = document.getElementById('name').value;
+            
             // Title
             doc.setFontSize(20);
-            doc.setTextColor(42, 82, 152);
-            doc.text(currentStory.title, 20, 30);
+            doc.text(`The Life Story of ${name}`, 20, 20);
             
             // Subtitle
             doc.setFontSize(12);
-            doc.setTextColor(100, 100, 100);
-            doc.text('An Inspiring Life Story Based on Rockefeller Principles', 20, 40);
+            doc.text('Based on J.D. Rockefeller\'s Principles for Success', 20, 30);
             
-            let yPosition = 60;
+            // Story content
+            doc.setFontSize(10);
             
-            currentStory.sections.forEach(section => {
-                // Check if we need a new page
-                if (yPosition > 250) {
-                    doc.addPage();
-                    yPosition = 30;
-                }
-                
-                // Section title
-                doc.setFontSize(14);
-                doc.setTextColor(42, 82, 152);
-                doc.text(section.title, 20, yPosition);
-                yPosition += 10;
-                
-                // Section content
-                doc.setFontSize(10);
-                doc.setTextColor(68, 68, 68);
-                const splitText = doc.splitTextToSize(section.content, 170);
-                doc.text(splitText, 20, yPosition);
-                yPosition += splitText.length * 5 + 10;
-            });
+            // Convert HTML to plain text for PDF
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = generatedStory;
+            const plainText = tempDiv.textContent || tempDiv.innerText || '';
             
-            // Save the PDF
-            doc.save(`${currentName}-Life-Story.pdf`);
+            const splitText = doc.splitTextToSize(plainText, 170);
+            doc.text(splitText, 20, 45);
+            
+            // Footer
+            doc.setFontSize(8);
+            doc.text('Generated by Life Story Generator - Rockefeller Principles', 20, 280);
+            
+            doc.save(`${name}_Life_Story.pdf`);
         }
-
-        function shareStory() {
-            const shareData = {
-                name: currentName,
-                story: currentStory,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Create a shareable link (in a real app, this would be saved to a server)
-            const encodedData = btoa(JSON.stringify(shareData));
-            const shareUrl = `${window.location.origin}${window.location.pathname}?story=${encodedData}`;
-            
-            document.getElementById('shareLink').value = shareUrl;
-            document.getElementById('shareSection').style.display = 'block';
-        }
-
-        function copyLink() {
-            const shareLink = document.getElementById('shareLink');
-            shareLink.select();
-            document.execCommand('copy');
-            alert('Link copied to clipboard!');
-        }
-
-        function generateNewStory() {
-            document.getElementById('name').value = '';
-            document.getElementById('storyContainer').style.display = 'none';
-            document.getElementById('shareSection').style.display = 'none';
-            currentStory = null;
-            currentName = '';
-        }
-
-        // Check if there's a shared story in the URL
-        window.addEventListener('load', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const storyData = urlParams.get('story');
-            
-            if (storyData) {
-                try {
-                    const decodedData = JSON.parse(atob(storyData));
-                    currentName = decodedData.name;
-                    currentStory = decodedData.story;
-                    document.getElementById('name').value = currentName;
-                    document.getElementById('storyContainer').style.display = 'block';
-                    displayStory(currentStory);
-                } catch (e) {
-                    console.error('Error loading shared story:', e);
-                }
-            }
-        });
-
-        // Add Enter key support for the name input
-        document.getElementById('name').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generateStory();
-            }
-        });
     </script>
 </body>
 </html>
