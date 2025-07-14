@@ -1,1 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rockefeller Life Story Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .form-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 1.1em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.1em;
+            transition: border-color 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2a5298;
+            background: white;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #2a5298, #1e3c72);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .generate-btn:hover {
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .story-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-top: 30px;
+            display: none;
+        }
+
+        .story-title {
+            text-align: center;
+            color: #2a5298;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 15px;
+        }
+
+        .story-content {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #444;
+            text-align: justify;
+        }
+
+        .story-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-left: 4px solid #2a5298;
+            background: #f8f9fa;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .story-section h3 {
+            color: #2a5298;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .action-btn {
+            margin: 0 10px;
+            padding: 12px 25px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+        }
+
+        .share-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border: 1px solid #2a5298;
+        }
+
+        .share-link {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #2a5298;
+            font-size: 1.2em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2a5298;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .inspiration-quote {
+            text-align: center;
+            font-style: italic;
+            color: white;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-container, .story-container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .action-btn {
+                display: block;
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Rockefeller Life Story Generator ✨</h1>
+            <p>Create an inspiring life story based on the timeless wisdom of J.D. Rockefeller's principles for success and prosperity</p>
+        </div>
+
+        <div class="form-container">
+            <div class="form-group">
+                <label for="name">Your Name:</label>
+                <input type="text" id="name" placeholder="Enter your name to begin your journey..." required>
+            </div>
+            
+            <button class="generate-btn" onclick="generateStory()">
+                🚀 Generate My Life Story
+            </button>
+        </div>
+
+        <div class="story-container" id="storyContainer">
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Crafting your inspiring life story...</p>
+            </div>
+            
+            <div id="storyContent" style="display: none;">
+                <h2 class="story-title" id="storyTitle"></h2>
+                <div class="story-content" id="storyText"></div>
+                
+                <div class="actions">
+                    <button class="action-btn" onclick="generatePDF()">📄 Download PDF</button>
+                    <button class="action-btn" onclick="shareStory()">🔗 Share Story</button>
+                    <button class="action-btn" onclick="generateNewStory()">✨ New Story</button>
+                </div>
+                
+                <div class="share-section" id="shareSection" style="display: none;">
+                    <h4>Share Your Story:</h4>
+                    <input type="text" class="share-link" id="shareLink" readonly>
+                    <button class="action-btn" onclick="copyLink()">📋 Copy Link</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="inspiration-quote">
+            <p>"The ability to deal with people is as purchasable a commodity as sugar or coffee. And I will pay more for that ability than for any other under the sun." - J.D. Rockefeller</p>
+        </div>
+    </div>
+
+    <script>
+        let currentStory = null;
+        let currentName = '';
+
+        function generateStory() {
+            const name = document.getElementById('name').value.trim();
+            if (!name) {
+                alert('Please enter your name to generate your story!');
+                return;
+            }
+
+            currentName = name;
+            document.getElementById('storyContainer').style.display = 'block';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('storyContent').style.display = 'none';
+            document.getElementById('shareSection').style.display = 'none';
+
+            // Simulate loading time for better UX
+            setTimeout(() => {
+                createLifeStory(name);
+            }, 2000);
+        }
+
+        function createLifeStory(name) {
+            const storyTemplate = {
+                title: `The Remarkable Journey of ${name}`,
+                sections: [
+                    {
+                        title: "Humble Beginnings",
+                        content: `${name} was born into modest circumstances, but even as a young person, there was something different about their approach to life. Unlike their peers who saw limitations, ${name} viewed every challenge as a stepping stone. They understood early that success isn't determined by where you start, but by the choices you make and the persistence you show. With unwavering determination, ${name} began their journey toward greatness.`
+                    },
+                    {
+                        title: "The Foundation Years",
+                        content: `During their formative years, ${name} embraced the principle of hard work above all else. While others sought shortcuts, ${name} knew that consistent effort was the true foundation of wealth and achievement. They dedicated themselves to learning, growing, and building the skills that would serve them throughout life. Every setback became a lesson, every challenge an opportunity to grow stronger and wiser.`
+                    },
+                    {
+                        title: "Building Confidence",
+                        content: `${name} discovered that believing in oneself was not just important—it was essential. They learned to trust their abilities and potential, never letting fear or self-doubt hold them back from pursuing their dreams. This confidence became their greatest asset, driving them to take calculated risks and seize opportunities that others might have missed. ${name} understood that confidence is the key that unlocks all other doors to success.`
+                    },
+                    {
+                        title: "Taking Action",
+                        content: `Rather than waiting for the perfect moment, ${name} embraced the power of taking action. They learned that perfection is the enemy of progress, and that initiative and decisive action create opportunities. Whether starting a new project, pursuing a goal, or facing a challenge, ${name} never hesitated to move forward. This bias toward action became their competitive advantage in a world full of hesitation.`
+                    },
+                    {
+                        title: "Turning Challenges into Triumphs",
+                        content: `Every obstacle that ${name} encountered became fuel for their growth. They understood that hardships build character and that difficulties are the training ground for future success. Instead of being discouraged by setbacks, ${name} used them as opportunities to develop resilience, creativity, and problem-solving skills. This ability to transform challenges into advantages set them apart from the crowd.`
+                    },
+                    {
+                        title: "Creating Their Own Luck",
+                        content: `${name} discovered that luck wasn't random—it was something you could create through preparation and hard work. They planned meticulously, worked diligently, and positioned themselves to take advantage of opportunities when they arose. Through strategic thinking and consistent effort, ${name} learned to manufacture their own success, making what others called 'luck' a predictable outcome of their efforts.`
+                    },
+                    {
+                        title: "The Power of Responsibility",
+                        content: `Taking full responsibility for their actions and outcomes became ${name}'s superpower. They refused to make excuses or blame circumstances for their situation. Instead, they focused on solutions and took ownership of both their successes and failures. This accountability mindset accelerated their growth and earned them the respect of everyone they encountered.`
+                    },
+                    {
+                        title: "Leadership Through Humility",
+                        content: `As ${name} achieved success, they never forgot the importance of humility and learning from others. They valued the strengths and contributions of those around them, creating strong teams and meaningful relationships. Their leadership style was built on appreciation, collaboration, and continuous learning—qualities that multiplied their impact and influence.`
+                    },
+                    {
+                        title: "The Joy of Giving Back",
+                        content: `With growing success came growing responsibility. ${name} understood that wealth and achievement should be used to lift others up. They gave back to their community not through handouts that created dependency, but through empowerment that helped others build their own success. This purposeful giving became a source of deep satisfaction and meaningful legacy.`
+                    },
+                    {
+                        title: "The Attitude That Changed Everything",
+                        content: `Throughout their journey, ${name} maintained a positive attitude that transformed work from a burden into a joy. They understood that mindset shapes reality, and by choosing to see opportunity in every situation, they created a life filled with purpose and satisfaction. This attitude became contagious, inspiring everyone around them to reach for their own greatness.`
+                    },
+                    {
+                        title: "The Legacy",
+                        content: `Today, ${name} stands as a testament to the power of applying timeless principles to modern life. Their journey from humble beginnings to remarkable success proves that with the right mindset, consistent effort, and unwavering determination, anyone can achieve greatness. ${name}'s story continues to inspire others to chase their dreams and handle life's challenges with wisdom and grace. The principles that guided ${name} continue to light the way for future generations of dreamers and achievers.`
+                    }
+                ]
+            };
+
+            currentStory = storyTemplate;
+            displayStory(storyTemplate);
+        }
+
+        function displayStory(story) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('storyContent').style.display = 'block';
+            document.getElementById('storyTitle').textContent = story.title;
+            
+            const storyText = document.getElementById('storyText');
+            storyText.innerHTML = '';
+            
+            story.sections.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'story-section';
+                sectionDiv.innerHTML = `
+                    <h3>${section.title}</h3>
+                    <p>${section.content}</p>
+                `;
+                storyText.appendChild(sectionDiv);
+            });
+        }
+
+        function generatePDF() {
+            if (!currentStory) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Title
+            doc.setFontSize(20);
+            doc.setTextColor(42, 82, 152);
+            doc.text(currentStory.title, 20, 30);
+            
+            // Subtitle
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.text('An Inspiring Life Story Based on Rockefeller Principles', 20, 40);
+            
+            let yPosition = 60;
+            
+            currentStory.sections.forEach(section => {
+                // Check if we need a new page
+                if (yPosition > 250) {
+                    doc.addPage();
+                    yPosition = 30;
+                }
+                
+                // Section title
+                doc.setFontSize(14);
+                doc.setTextColor(42, 82, 152);
+                doc.text(section.title, 20, yPosition);
+                yPosition += 10;
+                
+                // Section content
+                doc.setFontSize(10);
+                doc.setTextColor(68, 68, 68);
+                const splitText = doc.splitTextToSize(section.content, 170);
+                doc.text(splitText, 20, yPosition);
+                yPosition += splitText.length * 5 + 10;
+            });
+            
+            // Save the PDF
+            doc.save(`${currentName}-Life-Story.pdf`);
+        }
+
+        function shareStory() {
+            const shareData = {
+                name: currentName,
+                story: currentStory,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Create a shareable link (in a real app, this would be saved to a server)
+            const encodedData = btoa(JSON.stringify(shareData));
+            const shareUrl = `${window.location.origin}${window.location.pathname}?story=${encodedData}`;
+            
+            document.getElementById('shareLink').value = shareUrl;
+            document.getElementById('shareSection').style.display = 'block';
+        }
+
+        function copyLink() {
+            const shareLink = document.getElementById('shareLink');
+            shareLink.select();
+            document.execCommand('copy');
+            alert('Link copied to clipboard!');
+        }
+
+        function generateNewStory() {
+            document.getElementById('name').value = '';
+            document.getElementById('storyContainer').style.display = 'none';
+            document.getElementById('shareSection').style.display = 'none';
+            currentStory = null;
+            currentName = '';
+        }
+
+        // Check if there's a shared story in the URL
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const storyData = urlParams.get('story');
+            
+            if (storyData) {
+                try {
+                    const decodedData = JSON.parse(atob(storyData));
+                    currentName = decodedData.name;
+                    currentStory = decodedData.story;
+                    document.getElementById('name').value = currentName;
+                    document.getElementById('storyContainer').style.display = 'block';
+                    displayStory(currentStory);
+                } catch (e) {
+                    console.error('Error loading shared story:', e);
+                }
+            }
+        });
+
+        // Add Enter key support for the name input
+        document.getElementById('name').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateStory();
+            }
+        });
+    </script>
+</body>
+</html>
